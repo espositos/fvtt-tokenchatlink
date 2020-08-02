@@ -1,6 +1,6 @@
 export class ChatLink {
     static prepareEvent(message, html) {
-        let clickable = html.find('tag speaker')
+        let clickable = html.find('.message-sender');
         
         clickable.on('click', (e) => {
             e.preventDefault();
@@ -21,7 +21,7 @@ export class ChatLink {
             if (!data)
                 return;
 
-            if(ChatLink.selectTokenEvent(data))
+            if(ChatLink.selectToken(data))
                 ChatLink.panToTokenEvent(data);
         })
     }
@@ -34,7 +34,7 @@ export class ChatLink {
         
         let tokenSceneId = $tokenInfo.attr('data-token-id');
         if (tokenSceneId) {
-            let split = tokenSceneId.split('.')
+            let split = tokenSceneId.split('.');
             result.sceneId = split[0];
             result.tokenId = split[1];
         }
@@ -47,15 +47,6 @@ export class ChatLink {
         return result;
     }
 
-    static selectTokenEvent(data) {
-        let token = game.actors.tokens[data.tokenId];
-        
-        if (!token)
-            token = canvas.tokens.placeables.find(t => t.data._id === data.tokenId);
-
-        canvas.
-    }
-
     // If it's reached this far, assume scene is correct.
     static panToToken(data) {
         let actor = game.actors.tokens[data.tokenId];
@@ -65,7 +56,7 @@ export class ChatLink {
 
         let scale = canvas.scene._viewPosition.scale;
 
-        canvas.pan(actor.x, actor.y, scale);
+        canvas.animatePan({x: token.x, y: token.y, scale: scale, duration: 1000});
     }
 
     static selectToken(tokenId, actorId, sceneId) {
@@ -92,19 +83,28 @@ export class ChatLink {
     }
 
     static doSelectToken(user, tokenId) {
-
+        let token = ChatLink.getToken(tokenId)
+        if (token)
+            canvas.scene.selectObjects(ChatLink.getCoords(token));
     }
 
     static targetToken(user, tokenId) {
+        let token = ChatLink.getToken(tokenId);
+        if (token)
+            canvas.scene.targetObjects(ChatLink.getCoords(token));
+    }
 
+    static getCoords(token) {
+        let result = { x: token.center.x, y: token.center.y, width: token.w, height: token.h }
+        return result;
     }
 
     static hasPermission(user, tokenId) {
-            let actor = game.actors.tokens[tokenId];
-            
-            if(!actor)
-                actor = canvas.tokens.get(tokenId).actor;
+        let actor = game.actors.tokens[tokenId];
+        
+        if(!token)
+            actor = canvas.tokens.get(tokenId).actor;
 
-            return user.isGM || actor.hasPerm(user, "OWNER");
+        return user.isGM || actor.hasPerm(user, "OWNER");
     }
 }
