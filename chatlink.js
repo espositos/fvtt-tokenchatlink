@@ -1,97 +1,79 @@
 export class ChatLink {
-    static prepareEvent(message, html) {
+    static delay = 500;
+    static clicks = 0;
+    static timer = null;
+
+    static prepareEvent(message, html, speakerInfo) {
         let clickable = html.find('.message-sender');
-        
+
+        let speaker = speakerInfo.message.speaker;
+        let data = {sceneId: speaker.scene, actorId:speaker.actor, tokenId: speaker.token}
+
+        if (!data.sceneId)
+            data.sceneId = speakerInfo.author.viewedScene;
+
         clickable.on('click', (e) => {
             e.preventDefault();
 
-            let data = ChatLink.buildData(html);
-            
-            if (!data)
-                return;
-
             ChatLink.selectToken(data);
-        });
-
-        clickable.on('dblclick', (e) => {
-            e.preventDefault();
-
-            let data = ChatLink.buildData(html);
-            
-            if (!data)
-                return;
-
+        }).on('dblclick', (e) => {
             if(ChatLink.selectToken(data))
-                ChatLink.panToTokenEvent(data);
+                ChatLink.panToToken(data);
         })
-    }
-
-    static buildData(html) {
-        let result = {tokenId: '', actorId: '', sceneId: ''}
-
-        let $tokenInfo = html.find('[data-token-id]');
-        result.actorId = $tokenInfo.attr('data-actor-id');
-        
-        let tokenSceneId = $tokenInfo.attr('data-token-id');
-        if (tokenSceneId) {
-            let split = tokenSceneId.split('.');
-            result.sceneId = split[0];
-            result.tokenId = split[1];
-        }
-
-        if (!result.tokenId && !result.actorId) {
-            ui.notification.warn('No token or actor associated with this message.')
-            return null;
-        }
-        
-        return result;
     }
 
     // If it's reached this far, assume scene is correct.
     static panToToken(data) {
-        let actor = game.actors.tokens[data.tokenId];
-        
-        if(!actor)
-            actor = canvas.tokens.get(data.tokenId).actor;
+        let token = ChatLink.getToken(data);
 
         let scale = canvas.scene._viewPosition.scale;
 
-        canvas.animatePan({x: token.x, y: token.y, scale: scale, duration: 1000});
+        canvas.animatePan({x: token.x, y: token.y, scale: scale, duration: 500});
     }
 
-    static selectToken(tokenId, actorId, sceneId) {
-        if (!ChatLink.tokenExists(tokenId)) {
-            ui.notification.warn('No matching token found.')    
+    static selectToken(data) {
+        if (canvas.scene._id !== data.sceneId){
+            let sceneWarning = 'No token found in this scene.';
+            if (game.user.isGM) {
+                let scene = game.scenes.find(s => s.data._id === data.sceneId);
+                sceneWarning += ` Check scene ${scene?.data.name}`;
+            }
+            ui.notifications.warn(sceneWarning);
+            return false;
+        }
+
+        let token = ChatLink.getToken(data);
+
+        if (!token) {
+            ui.notifications.warn('No matching token found.'); 
             return false;
         }
         
         let user = game.user;
-        if (!userHasPermission(user, tokenId)) {
-            ChatLink.targetToken(user, tokenId);
+        if (!ChatLink.userHasPermission(user, token)) {
+            ChatLink.targetToken(user, token);
             return true;
         }
 
-        let scene = game.scenes.find(scene => scene._id === sceneId);
-        if (!ChatLink.tokenInScene(tokenId)){
-            ui.notification.warn(`This token is not on this scene. Check scene '${scene.displayName}'`)
-            return false;
-        }
-
-        ChatLink.doSelectToken(user, tokenId);
+        ChatLink.doSelectToken(user, token);
 
         return true;
     }
 
-    static doSelectToken(user, tokenId) {
-        let token = ChatLink.getToken(tokenId)
-        if (token)
-            canvas.scene.selectObjects(ChatLink.getCoords(token));
+    static getToken(data) {
+        let token = game.actors.tokens[data.tokenId]?.token;
+        if(!token)
+            token = canvas.tokens.placeables.find(t => t.actor._id === data.actorId);
+
+        return token;
     }
 
-    static targetToken(user, tokenId) {
-        let token = ChatLink.getToken(tokenId);
-        if (token)
-            canvas.scene.targetObjects(ChatLink.getCoords(token));
+    static doSelectToken(user, token) {
+        canvas.getLayer('TokenLayer').selectObjects(ChatLink.getCoords(token));
+    }
+
+    static targetToken(user, token) {
+        canvas.getLayer('TokenLayer').targetObjects(ChatLink.getCoords(token));
     }
 
     static getCoords(token) {
@@ -99,12 +81,7 @@ export class ChatLink {
         return result;
     }
 
-    static hasPermission(user, tokenId) {
-        let actor = game.actors.tokens[tokenId];
-        
-        if(!token)
-            actor = canvas.tokens.get(tokenId).actor;
-
-        return user.isGM || actor.hasPerm(user, "OWNER");
+    static userHasPermission(user, token) {
+        return user.isGM || token.actor.hasPerm(user, "OWNER");
     }
 }
