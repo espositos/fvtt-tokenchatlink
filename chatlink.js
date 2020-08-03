@@ -1,71 +1,115 @@
 export class ChatLink {
-    static delay = 500;
-    static clicks = 0;
-    static timer = null;
+    static clickTimeout = 250;
+    static clickCount = 0;
+    static clickTimer = null;
+    static playerWarning = (data) => i18nFormat('tokenchatlink.notInSight', data);
 
     static prepareEvent(message, html, speakerInfo) {
         let clickable = html.find('.message-sender');
 
         let speaker = speakerInfo.message.speaker;
-        let data = {sceneId: speaker.scene, actorId:speaker.actor, tokenId: speaker.token}
+        let speakerData = {idScene: speaker.scene, idActor:speaker.actor, idToken: speaker.token, name: speaker.alias ?? i18n('tokenchatlink.genericName')}
 
-        if (!data.sceneId)
-            data.sceneId = speakerInfo.author.viewedScene;
+        if (!speakerData.idScene)
+            speakerData.idScene = speakerInfo.author.viewedScene;
 
-        clickable.on('click', (e) => {
+        function clicks(speakerData) {
+            ChatLink.clickCount++;
+            if (ChatLink.clickCount == 1) {
+                ChatLink.clickTimer = setTimeout(() => {
+                    ChatLink.clickCount = 0;
+                    ChatLink.selectToken(speakerData);
+                }, ChatLink.clickTimeout);
+            } else {
+                ChatLink.clickCount = 0;
+                clearTimeout(ChatLink.clickTimer);
+                ChatLink.panToToken(speakerData);
+            }
+        }
+
+        clickable.on('click', () => {clicks(speakerData)}).on('dblclick', (e) => {
             e.preventDefault();
-
-            ChatLink.selectToken(data);
-        }).on('dblclick', (e) => {
-            if(ChatLink.selectToken(data))
-                ChatLink.panToToken(data);
         })
     }
 
     // If it's reached this far, assume scene is correct.
-    static panToToken(data) {
-        let token = ChatLink.getToken(data);
+    static panToToken(speakerData) {
+        let token = ChatLink.getToken(speakerData);
+        let user = game.user;
+        if (!ChatLink.isRightScene(user, speakerData))
+            return;
+
+        if (!ChatLink.permissionToSee(user, speakerData, token))
+            return;
 
         let scale = canvas.scene._viewPosition.scale;
 
         canvas.animatePan({x: token.x, y: token.y, scale: scale, duration: 500});
     }
 
-    static selectToken(data) {
-        if (canvas.scene._id !== data.sceneId){
-            let sceneWarning = 'No token found in this scene.';
-            if (game.user.isGM) {
-                let scene = game.scenes.find(s => s.data._id === data.sceneId);
-                sceneWarning += ` Check scene ${scene?.data.name}`;
-            }
-            ui.notifications.warn(sceneWarning);
-            return false;
-        }
-
-        let token = ChatLink.getToken(data);
-
-        if (!token) {
-            ui.notifications.warn('No matching token found.'); 
-            return false;
-        }
-        
+    static selectToken(speakerData) {
         let user = game.user;
-        if (!ChatLink.userHasPermission(user, token)) {
+        let message;
+        if (!ChatLink.isRightScene(user, speakerData))
+            return;
+
+        let token = ChatLink.getToken(speakerData);
+
+        if (!ChatLink.tokenExists(user, token))
+            return;
+        
+        if (!ChatLink.permissionToControl(user, token)) {
+            if (!ChatLink.permissionToSee(user, speakerData, token))
+                return;
+            
             ChatLink.targetToken(user, token);
-            return true;
+            return;
         }
 
         ChatLink.doSelectToken(user, token);
-
-        return true;
     }
 
-    static getToken(data) {
-        let token = game.actors.tokens[data.tokenId]?.token;
+    static getToken(speakerData) {
+        let token = game.actors.tokens[speakerData.idToken]?.token;
         if(!token)
-            token = canvas.tokens.placeables.find(t => t.actor._id === data.actorId);
+            token = canvas.tokens.placeables.find(t => t.actor._id === speakerData.idActor);
 
         return token;
+    }
+
+    static isRightScene(user, speakerData) {
+        if (canvas.scene._id === speakerData.idScene)
+            return true;
+
+        let sceneNote;
+        if (!speakerData.idScene) {
+            sceneNote = ` ${i18n('tokenchatlink.noSceneFound')}`;
+        } else {
+            let tokenScene = game.scenes.find(s => s.data._id === speakerData.idScene);
+            sceneNote = ` ${i18nFormat('tokenchatlink.checkScene', {sceneName: tokenScene?.data.name})}`;
+        }
+
+        let message = user.isGM ? ChatLink.playerWarning(speakerData) + sceneNote : speakerData.name + ChatLink.playerWarning(speakerData);
+        ChatLink.warning(message);
+    }
+
+    static tokenExists(user, token) {
+        if (token)
+            return true;
+
+        let message = user.isGM ? speakerData.name + ChatLink.playerWarning(speakerData) + ` ${i18n('tokenchatlink.noTokenFound')}` : speakerData.name + ChatLink.playerWarning(speakerData);
+        ChatLink.warning(message);
+    }
+
+    static permissionToSee(user, speakerData, token) {
+        if (user.isGM || token.visible)
+            return true;
+        
+        ChatLink.warning(speakerData.name + ChatLink.playerWarning(speakerData));
+    }
+
+    static permissionToControl(user, token) {
+        return user.isGM || token.actor.hasPerm(user, "OWNER");
     }
 
     static doSelectToken(user, token) {
@@ -77,11 +121,14 @@ export class ChatLink {
     }
 
     static getCoords(token) {
-        let result = { x: token.center.x, y: token.center.y, width: token.w, height: token.h }
+        let result = { x: token.center.x, y: token.center.y, width: 1, height: 1 }
         return result;
     }
-
-    static userHasPermission(user, token) {
-        return user.isGM || token.actor.hasPerm(user, "OWNER");
+    
+    static warning(message) {
+        ui.notifications.warn(message);
     }
 }
+
+const i18n = (toTranslate) => game.i18n.localize(toTranslate);
+const i18nFormat = (toTranslate, data) => game.i18n.format(toTranslate, data);
