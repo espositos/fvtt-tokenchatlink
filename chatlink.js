@@ -7,6 +7,8 @@ export class ChatLink {
     static prepareEvent(message, html, speakerInfo) {
         let clickable = html.find('.message-sender');
 
+        ChatLink.formatLink(clickable);
+
         let speaker = speakerInfo.message.speaker;
         let speakerData = {idScene: speaker.scene, idActor:speaker.actor, idToken: speaker.token, name: speaker.alias ?? i18n('tokenchatlink.genericName')}
 
@@ -18,12 +20,12 @@ export class ChatLink {
             if (ChatLink.clickCount == 1) {
                 ChatLink.clickTimer = setTimeout(() => {
                     ChatLink.clickCount = 0;
-                    ChatLink.selectToken(speakerData);
+                    ChatLink.panToToken(speakerData);
                 }, ChatLink.clickTimeout);
             } else {
                 ChatLink.clickCount = 0;
                 clearTimeout(ChatLink.clickTimer);
-                ChatLink.panToToken(speakerData);
+                ChatLink.selectToken(speakerData);
             }
         }
 
@@ -127,6 +129,10 @@ export class ChatLink {
     
     static warning(message) {
         ui.notifications.warn(message);
+    }
+
+    static formatLink(html) {
+        // do nothing for now
     }
 }
 
