@@ -7,7 +7,6 @@
     "compatibleCoreVersion": "0.7.0",
     "styles":[
         "./styles/tokenchatlink.css",
-        "./styles/tlite/tlite.css"
     ],
     "esmodules": [
         "./init.js"
@@ -19,9 +18,8 @@
             "path":"lang/en.json"
         }
     ],
-    "scripts":["./lib/popperjs/popper-lite.min.js"],
     "url": "https://github.com/espositos/fvtt-tokenchatlink",
     "manifest": "https://github.com/espositos/fvtt-tokenchatlink/raw/master/module.json",
-    "version": "0.0.1",
-    "download": "https://github.com/espositos/fvtt-tokenchatlink/releases/download/0.0.1/release_0.0.1.zip"
+    "version": "1.0.0",
+    "download": "https://github.com/espositos/fvtt-tokenchatlink/releases/download/1.0.0/release_1.0.0.zip"
 }
