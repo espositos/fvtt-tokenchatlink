@@ -217,6 +217,7 @@ export class TooltipHelper {
     static playerTips() {
         return [
             game.i18n.localize("tokenchatlink.playerClickInstruction"),
+            game.i18n.localize("tokenchatlink.shiftInstruction"),
             game.i18n.localize("tokenchatlink.doubleClickInstruction"),
             game.i18n.localize("tokenchatlink.ctrlClickInstruction")
         ]
