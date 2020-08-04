@@ -4,15 +4,21 @@ export class ChatLink {
     static clickTimer = null;
     static playerWarning = (data) => ChatLink.i18nFormat('tokenchatlink.notInSight', data);
 
+    static hoverTimeout = 1500;
+    static hoverTimer = null;
+
     static i18n = (toTranslate) => game.i18n.localize(toTranslate);
     static i18nFormat = (toTranslate, data) => game.i18n.format(toTranslate, data);
     
     static prepareEvent(message, html, speakerInfo) {
         let clickable = html.find('.message-sender');
 
+        let speaker = speakerInfo.message.speaker;
+        if (!(speaker.actor || speaker.token))
+            return;
+
         ChatLink.formatLink(clickable);
 
-        let speaker = speakerInfo.message.speaker;
         let speakerData = {idScene: speaker.scene, idActor:speaker.actor, idToken: speaker.token, name: speaker.alias ?? ChatLink.i18n('tokenchatlink.genericName')}
 
         if (!speakerData.idScene)
@@ -157,15 +163,62 @@ export class ChatLink {
     static formatLink(html) {
         html.hover(() => {
             html.addClass('tokenChatLink')
-            const tooltip = document.createElement("SPAN");
-            tooltip.classList.add('tooltip');
-            tooltip.textContent = 'test';
-            html.appendChild(tooltip)
+            let tooltip = $(document).find('.tokenChatLink-tooltip');
+            tooltip.remove();
+
+            ChatLink.hoverTimer = setTimeout(() => {
+                // add tooltip
+                tooltip = document.createElement("SPAN");
+                tooltip.classList.add('tokenChatLink-tooltip');
+                let tooltipContent = TooltipHelper.getContent();
+                tooltip.innerHTML = tooltipContent;
+                html.append(tooltip)
+
+                // adjust position of tooltip
+                tooltip = $(document).find('.tokenChatLink-tooltip');
+                let htmlRect = html[0].getBoundingClientRect();
+                let tooltipRect = tooltip[0].getBoundingClientRect();
+                tooltip.css('top', htmlRect.y - tooltipRect.height - 10).css('left', 15);
+            }, ChatLink.hoverTimeout);
         }, 
         () => {
+            clearTimeout(ChatLink.hoverTimer);
             html.removeClass('tokenChatLink')
-            let tooltip = html.querySelector('.tooltip');
-            html.removeChild(tooltip);
+            let tooltip = $(document).find('.tokenChatLink-tooltip');
+            tooltip.remove();
         });
+    }
+}
+
+export class TooltipHelper {
+    static getContent() {
+        let tips = game.user.isGM ? TooltipHelper.gmTips() : TooltipHelper.playerTips();
+
+        let tooltipData = {
+            title: game.i18n.localize("tokenchatlink.instructionsTitle"),
+            tips: tips
+        }
+        
+        let template = Handlebars.compile('{{> modules/token-chat-link/templates/instructions.hbs}}');
+        let content = template(tooltipData);
+
+        return content;
+    }
+
+    static gmTips() {
+        return [
+            game.i18n.localize("tokenchatlink.gmClickInstruction"),
+            game.i18n.localize("tokenchatlink.shiftInstruction"),
+            game.i18n.localize("tokenchatlink.doubleClickInstruction"),
+            game.i18n.localize("tokenchatlink.ctrlClickInstruction")
+        ]
+    }
+
+    static playerTips() {
+        return [
+            game.i18n.localize("tokenchatlink.playerClickInstruction"),
+            game.i18n.localize("tokenchatlink.doubleClickInstruction"),
+            game.i18n.localize("tokenchatlink.ctrlClickInstruction")
+        ]
     }
 }

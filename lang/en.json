@@ -4,9 +4,10 @@
     "tokenchatlink.notInSight": "{name} is nowhere to be seen.",
     "tokenchatlink.checkScene": "Check scene '{sceneName}'.",
     "tokenchatlink.genericName": "This creature",
-    "tokenchatlink.instructionsTitle": "Controls",
-    "tokenchatlink.leftClick": "",
-    "tokenchatlink.rightClick": "",
-    "tokenchatlink.controlKey": "",
-    "tokenchatlink.doubleClick": ""
+    "tokenchatlink.instructionsTitle": "Token Chat Link Controls",
+    "tokenchatlink.playerClickInstruction": "Click: target",
+    "tokenchatlink.gmClickInstruction": "Click: select",
+    "tokenchatlink.shiftInstruction": "Shift: target",
+    "tokenchatlink.ctrlClickInstruction": "Control: add/remove",
+    "tokenchatlink.doubleClickInstruction": "Double click: pan to"
 }
