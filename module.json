@@ -6,7 +6,7 @@
     "minimumCoreVersion": "0.6.0",
     "compatibleCoreVersion": "0.7.0",
     "styles":[
-        "./styles/tokenchatlink.css",
+        "./styles/tokenchatlink.css"
     ],
     "esmodules": [
         "./init.js"
