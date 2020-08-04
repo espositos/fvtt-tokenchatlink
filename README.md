@@ -1,6 +1,12 @@
 # Token Chat Link
+A simple module that turns speakers' names into a link to the token. 
 
-A simple module that turns speaker's names into a link to their token. 
+# Installation
+1. Inside Foundry's Configuration and Setup screen, go to **Add-on Modules**
+2. Click "Install Module"
+3. or in the Manifest URL field paste: `https://github.com/espositos/fvtt-tokenchatlink/raw/master/module.json`
+4. Within the game, click on **Settings** -> **Manage Modules** and make sure the Token Chat Link is enabled.
+
 
 ## GMs
  - Left click to select
@@ -9,4 +15,4 @@ A simple module that turns speaker's names into a link to their token.
  - Control click to add or remove from your currently selected/targetted list
 
  ## Players
- - Same as GMs, but if you can't select then you will target instead.
+ - Same as GMs, but if you don't have permission to select a token then you will target it instead.
