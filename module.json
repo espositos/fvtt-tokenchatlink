@@ -1,10 +1,13 @@
 {
-    "name": "chat-token-link",
-    "title": "Chat Token Link",
+    "name": "token-chat-link",
+    "title": "Token Chat Link",
     "author": "^ and stick#0520",
-    "description": "Turns the name of the speaker in chat into a link to the token.",
+    "description": "Turns the name of the speaker in the chat log into a link to their token.",
     "minimumCoreVersion": "0.6.0",
     "compatibleCoreVersion": "0.7.0",
+    "styles":[
+        "./styles/tokenchatlink.css",
+    ],
     "esmodules": [
         "./init.js"
     ],
@@ -16,7 +19,8 @@
         }
     ],
     "url": "https://github.com/espositos/fvtt-chattokenlink",
-    "manifest": "https://github.com/espositos/fvtt-chattokenlink/raw/master/module.json",
+    "url": "https://github.com/espositos/fvtt-tokenchatlink",
+    "manifest": "https://github.com/espositos/fvtt-tokenchatlink/raw/master/module.json",
     "version": "0.0.1",
-    "download": "https://github.com/espositos/fvtt-chattokenlink/releases/download/0.0.1/release_0.0.1.zip"
+    "download": "https://github.com/espositos/fvtt-tokenchatlink/releases/download/0.0.1/release_0.0.1.zip"
 }
