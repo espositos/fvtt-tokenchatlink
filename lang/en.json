@@ -1,0 +1,12 @@
+{
+    "tokenchatlink.noTokenFound": "No token found.",
+    "tokenchatlink.noSceneFound": "No scene found.",
+    "tokenchatlink.notInSight": "{name} is nowhere to be seen.",
+    "tokenchatlink.checkScene": "Check scene '{sceneName}'.",
+    "tokenchatlink.genericName": "This creature",
+    "tokenchatlink.instructionsTitle": "Controls",
+    "tokenchatlink.leftClick": "",
+    "tokenchatlink.rightClick": "",
+    "tokenchatlink.controlKey": "",
+    "tokenchatlink.doubleClick": ""
+}
