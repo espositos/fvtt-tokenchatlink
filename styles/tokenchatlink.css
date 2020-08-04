@@ -2,19 +2,3 @@
     text-decoration: underline;
     cursor: pointer;
 }
-
-.tokenChatLink-tooltip {
-    position: absolute;
-    display: block;
-    visibility: hidden;
-    width: auto;
-    height: auto;
-    text-align: left;
-    padding: 5px;
-    border-radius:10px;
-    color: #222;
-    font-size: small;
-    background-color: #ddd;
-    border: 1px solid #000;
-    z-index: 99;
-}

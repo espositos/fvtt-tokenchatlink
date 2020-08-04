@@ -32,9 +32,11 @@ export class ChatLink {
             }
         }
 
-        clickable.on('click', (e) => {clicks(e, speakerData)}).on('dblclick', (e) => {
+        clickable.on('click', (e) => {
+            clicks(e, speakerData)
+        }).on('dblclick', (e) => {
             e.preventDefault();
-        })
+        });
     }
 
     // If it's reached this far, assume scene is correct.
@@ -61,14 +63,9 @@ export class ChatLink {
         let token = ChatLink.getToken(speakerData);
         if (!ChatLink.tokenExists(user, speakerData, token))
             return;
-        
-        if (!ChatLink.permissionToControl(user, token)) {
-            if (!ChatLink.permissionToSee(user, speakerData, token))
-                return;
-            
-            ChatLink.targetToken(event, user, token);
+
+        if (!ChatLink.permissionToSee(user, speakerData, token))
             return;
-        }
 
         ChatLink.doSelectToken(event, user, token);
     }
@@ -117,7 +114,22 @@ export class ChatLink {
     }
 
     static doSelectToken(event, user, token) {
+        if (!ChatLink.permissionToControl(user, token)) {      
+            ChatLink.targetToken(event, user, token);
+            return;
+        }
+
+        let shiftKey = event.shiftKey;
         let ctrlKey = event.ctrlKey;
+
+        if (shiftKey) {
+            ChatLink.targetToken(event, user, token, ctrlKey);
+        } else {
+            ChatLink.controlToken(event, user, token, ctrlKey);
+        }
+    }
+
+    static controlToken(event, user, token, ctrlKey) {
         let releaseOthers = {releaseOthers: !ctrlKey};
         if (token._controlled && ctrlKey)
             token.release();
@@ -125,8 +137,7 @@ export class ChatLink {
             token.control(releaseOthers);
     }
 
-    static targetToken(event, user, token) {
-        let ctrlKey = event.ctrlKey;
+    static targetToken(event, user, token, ctrlKey) {
         let releaseOthers = {releaseOthers: !ctrlKey};
         if (token.isTargeted && ctrlKey)
             token.setTarget(false, releaseOthers)
@@ -146,32 +157,15 @@ export class ChatLink {
     static formatLink(html) {
         html.hover(() => {
             html.addClass('tokenChatLink')
-            let htmlPos = html[0].getBoundingClientRect();
-            let tooltip = html.find('.tokenChatLink-tooltip');
-            tooltip.css('left', htmlPos.x).css('top', htmlPos.y).show();
+            const tooltip = document.createElement("SPAN");
+            tooltip.classList.add('tooltip');
+            tooltip.textContent = 'test';
+            html.appendChild(tooltip)
         }, 
         () => {
             html.removeClass('tokenChatLink')
-            let tooltip = html.find('.tokenChatLink-tooltip');
-            tooltip.hide();
+            let tooltip = html.querySelector('.tooltip');
+            html.removeChild(tooltip);
         });
-        let tooltipContent = TooltipHelper.compile();
-        html.append(tooltipContent);
-    }
-}
-
-class TooltipHelper {
-    static compile() {
-        let templateData = {
-            tips: [
-                "Tip 1",
-                "Tip 2",
-                "Tip 3",
-                "Tip 4"
-            ]
-        }
-        let template = Handlebars.compile('{{> modules/token-chat-link/templates/instructions.hbs}}');
-        let content = template(templateData);
-        return content;
     }
 }

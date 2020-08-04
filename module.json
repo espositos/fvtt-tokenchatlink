@@ -7,6 +7,7 @@
     "compatibleCoreVersion": "0.7.0",
     "styles":[
         "./styles/tokenchatlink.css",
+        "./styles/tlite/tlite.css"
     ],
     "esmodules": [
         "./init.js"
@@ -18,7 +19,7 @@
             "path":"lang/en.json"
         }
     ],
-    "url": "https://github.com/espositos/fvtt-chattokenlink",
+    "scripts":["./lib/popperjs/popper-lite.min.js"],
     "url": "https://github.com/espositos/fvtt-tokenchatlink",
     "manifest": "https://github.com/espositos/fvtt-tokenchatlink/raw/master/module.json",
     "version": "0.0.1",
