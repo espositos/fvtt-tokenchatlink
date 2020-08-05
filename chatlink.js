@@ -58,16 +58,15 @@ export class ChatLink {
     // If it's reached this far, assume scene is correct.
     static panToToken(event, speakerData) {
         let user = game.user;
-        if (!ChatLink.isRightScene(user, speakerData))
-            return;
         
         let token = ChatLink.getToken(speakerData);
+        if (!ChatLink.tokenExists(user, speakerData, token))
+            return;
+
         if (!ChatLink.permissionToSee(user, speakerData, token))
             return;
 
-        let scale = canvas.scene._viewPosition.scale;
-
-        canvas.animatePan({x: token.x, y: token.y, scale: scale, duration: 500});
+        ChatLink.doPanToToken(event, user, token);
     }
 
     static selectToken(event, speakerData) {
@@ -91,6 +90,17 @@ export class ChatLink {
         return token;
     }
 
+    static tokenExists(user, speakerData, token) {
+        if (token && token.interactive)
+            return true;
+        
+        if (!ChatLink.isRightScene(user, speakerData))
+            return;
+
+        let message = user.isGM ? ChatLink.playerWarning(speakerData) + ` ${ChatLink.i18n('tokenchatlink.noTokenFound')}` : ChatLink.playerWarning(speakerData);
+        ChatLink.warning(message);
+    }
+
     static isRightScene(user, speakerData) {
         if (canvas.scene._id === speakerData.idScene)
             return true;
@@ -104,17 +114,6 @@ export class ChatLink {
         }
 
         let message = user.isGM ? ChatLink.playerWarning(speakerData) + sceneNote : ChatLink.playerWarning(speakerData);
-        ChatLink.warning(message);
-    }
-
-    static tokenExists(user, speakerData, token) {
-        if (token && token.interactive)
-            return true; 
-        
-        if (!ChatLink.isRightScene(user, speakerData))
-            return;
-
-        let message = user.isGM ? ChatLink.playerWarning(speakerData) + ` ${ChatLink.i18n('tokenchatlink.noTokenFound')}` : ChatLink.playerWarning(speakerData);
         ChatLink.warning(message);
     }
 
@@ -143,6 +142,12 @@ export class ChatLink {
         } else {
             ChatLink.controlToken(event, user, token, ctrlKey);
         }
+    }
+
+    static doPanToToken(event, user, token) {
+        let scale = canvas.scene._viewPosition.scale;
+
+        canvas.animatePan({x: token.x, y: token.y, scale: scale, duration: 500});
     }
 
     static controlToken(event, user, token, ctrlKey) {
