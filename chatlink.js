@@ -120,13 +120,13 @@ export class ChatLink {
     }
 
     static doSelectToken(event, user, token) {
+        let ctrlKey = event.ctrlKey;
         if (!ChatLink.permissionToControl(user, token)) {      
-            ChatLink.targetToken(event, user, token);
+            ChatLink.targetToken(event, user, token, ctrlKey);
             return;
         }
 
         let shiftKey = event.shiftKey;
-        let ctrlKey = event.ctrlKey;
 
         if (shiftKey) {
             ChatLink.targetToken(event, user, token, ctrlKey);
