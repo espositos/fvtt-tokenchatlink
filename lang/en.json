@@ -5,9 +5,12 @@
     "tokenchatlink.checkScene": "Check scene '{sceneName}'.",
     "tokenchatlink.genericName": "This creature",
     "tokenchatlink.instructionsTitle": "Token Chat Link Controls",
-    "tokenchatlink.playerClickInstruction": "Click: select/target",
-    "tokenchatlink.gmClickInstruction": "Click: select",
-    "tokenchatlink.shiftInstruction": "Shift: target",
-    "tokenchatlink.ctrlClickInstruction": "Control: add/remove",
-    "tokenchatlink.doubleClickInstruction": "Double click: pan to"
+    "tokenchatlink.gmClick": "Click: select",
+    "tokenchatlink.gmCtrlClick": "Control+click: add/remove select",
+    "tokenchatlink.gmCtrlShiftClick": "Control+shift+click: add/remove target",
+    "tokenchatlink.playerClick": "Click: select/target",
+    "tokenchatlink.playerCtrlClick": "Control+click: add/remove select/target",
+    "tokenchatlink.playerCtrlShiftClick": "Control+shift+click: add/remove target",
+    "tokenchatlink.shiftClick": "Shift+click: target",
+    "tokenchatlink.doubleClick": "Double-click: pan to"
 }
