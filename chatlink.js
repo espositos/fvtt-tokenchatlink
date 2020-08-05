@@ -79,7 +79,7 @@ export class ChatLink {
     static getToken(speakerData) {
         let token = game.actors.tokens[speakerData.idToken]?.token;
         if(!token)
-            token = canvas.tokens.placeables.find(t => t.actor._id === speakerData.idActor);
+            token = canvas.tokens.placeables.find(t => t.actor?._id === speakerData.idActor);
 
         return token;
     }
@@ -120,13 +120,13 @@ export class ChatLink {
     }
 
     static doSelectToken(event, user, token) {
+        let ctrlKey = event.ctrlKey;
         if (!ChatLink.permissionToControl(user, token)) {      
-            ChatLink.targetToken(event, user, token);
+            ChatLink.targetToken(event, user, token, ctrlKey);
             return;
         }
 
         let shiftKey = event.shiftKey;
-        let ctrlKey = event.ctrlKey;
 
         if (shiftKey) {
             ChatLink.targetToken(event, user, token, ctrlKey);
