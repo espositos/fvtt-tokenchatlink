@@ -14,7 +14,7 @@ A simple module that turns speakers' names into a link to the token.
  - Left click to select
  - Shift click to target
  - Double click to pan
- - Control click to add or remove from your currently selected/targetted list
+ - Control can be combined with other clicks to add or remove from your currently selected/targetted list
 
  ## Players
  - Same as GMs, but if you don't have permission to select a token then you will target it instead.

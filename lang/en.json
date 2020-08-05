@@ -12,5 +12,7 @@
     "tokenchatlink.playerCtrlClick": "Control+click: add/remove select/target",
     "tokenchatlink.playerCtrlShiftClick": "Control+shift+click: add/remove target",
     "tokenchatlink.shiftClick": "Shift+click: target",
-    "tokenchatlink.doubleClick": "Double-click: pan to"
+    "tokenchatlink.doubleClick": "Double-click: pan to",
+    "tokenchatlink.settings.hoverTooltip.name": "Show hover tooltip instructions",
+    "tokenchatlink.settings.hoverTooltip.hint": "Show the token chat link instructions in a tooltip when hovering over a speaker's name."
 }
