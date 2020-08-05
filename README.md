@@ -1,6 +1,8 @@
 # Token Chat Link
 A simple module that turns speakers' names into a link to the token. 
 
+![Select from the chatlog](.github/readme/example.gif)
+
 # Installation
 1. Inside Foundry's Configuration and Setup screen, go to **Add-on Modules**
 2. Click "Install Module"
@@ -16,3 +18,6 @@ A simple module that turns speakers' names into a link to the token.
 
  ## Players
  - Same as GMs, but if you don't have permission to select a token then you will target it instead.
+
+ ## Known issues / warning
+ - Information from messages posted before you join may not link reliably.

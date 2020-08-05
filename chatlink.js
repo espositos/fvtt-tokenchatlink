@@ -207,19 +207,21 @@ export class TooltipHelper {
 
     static gmTips() {
         return [
-            game.i18n.localize("tokenchatlink.gmClickInstruction"),
-            game.i18n.localize("tokenchatlink.shiftInstruction"),
-            game.i18n.localize("tokenchatlink.doubleClickInstruction"),
-            game.i18n.localize("tokenchatlink.ctrlClickInstruction")
+            game.i18n.localize("tokenchatlink.gmClick"),
+            game.i18n.localize("tokenchatlink.shiftClick"),
+            game.i18n.localize("tokenchatlink.doubleClick"),
+            game.i18n.localize("tokenchatlink.gmCtrlClick"),
+            game.i18n.localize("tokenchatlink.gmCtrlShiftClick")
         ]
     }
 
     static playerTips() {
         return [
-            game.i18n.localize("tokenchatlink.playerClickInstruction"),
-            game.i18n.localize("tokenchatlink.shiftInstruction"),
-            game.i18n.localize("tokenchatlink.doubleClickInstruction"),
-            game.i18n.localize("tokenchatlink.ctrlClickInstruction")
+            game.i18n.localize("tokenchatlink.playerClick"),
+            game.i18n.localize("tokenchatlink.shiftClick"),
+            game.i18n.localize("tokenchatlink.doubleClick"),
+            game.i18n.localize("tokenchatlink.playerCtrlClick"),
+            game.i18n.localize("tokenchatlink.playerCtrlShiftClick")
         ]
     }
 }
