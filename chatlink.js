@@ -79,7 +79,7 @@ export class ChatLink {
     static getToken(speakerData) {
         let token = game.actors.tokens[speakerData.idToken]?.token;
         if(!token)
-            token = canvas.tokens.placeables.find(t => t.actor._id === speakerData.idActor);
+            token = canvas.tokens.placeables.find(t => t.actor?._id === speakerData.idActor);
 
         return token;
     }
