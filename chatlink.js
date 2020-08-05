@@ -4,11 +4,20 @@ export class ChatLink {
     static clickTimer = null;
     static playerWarning = (data) => ChatLink.i18nFormat('tokenchatlink.notInSight', data);
 
-    static hoverTimeout = 1500;
+    static showTooltip = true;
+    static hoverTimeout = 1000;
     static hoverTimer = null;
 
     static i18n = (toTranslate) => game.i18n.localize(toTranslate);
     static i18nFormat = (toTranslate, data) => game.i18n.format(toTranslate, data);
+
+    static init() {
+        ChatLink.updateSettings();
+    }
+
+    static updateSettings() {
+        ChatLink.showTooltip = game.settings.get('token-chat-link', 'hoverTooltip');
+    }
     
     static prepareEvent(message, html, speakerInfo) {
         let clickable = html.find('.message-sender');
@@ -18,8 +27,8 @@ export class ChatLink {
             return;
 
         ChatLink.formatLink(clickable);
-
-        let speakerData = {idScene: speaker.scene, idActor:speaker.actor, idToken: speaker.token, name: speaker.alias ?? ChatLink.i18n('tokenchatlink.genericName')}
+        let speakerName = clickable[0].textContent ?? speaker.alias ?? ChatLink.i18n('tokenchatlink.genericName');
+        let speakerData = { idScene: speaker.scene, idActor:speaker.actor, idToken: speaker.token, name: speakerName }
 
         if (!speakerData.idScene)
             speakerData.idScene = speakerInfo.author.viewedScene;
@@ -45,11 +54,12 @@ export class ChatLink {
         });
     }
 
+
     // If it's reached this far, assume scene is correct.
     static panToToken(event, speakerData) {
         let user = game.user;
         if (!ChatLink.isRightScene(user, speakerData))
-        return;
+            return;
         
         let token = ChatLink.getToken(speakerData);
         if (!ChatLink.permissionToSee(user, speakerData, token))
@@ -62,9 +72,6 @@ export class ChatLink {
 
     static selectToken(event, speakerData) {
         let user = game.user;
-        
-        if (!ChatLink.isRightScene(user, speakerData))
-            return;
 
         let token = ChatLink.getToken(speakerData);
         if (!ChatLink.tokenExists(user, speakerData, token))
@@ -102,7 +109,10 @@ export class ChatLink {
 
     static tokenExists(user, speakerData, token) {
         if (token && token.interactive)
-            return true;
+            return true; 
+        
+        if (!ChatLink.isRightScene(user, speakerData))
+            return;
 
         let message = user.isGM ? ChatLink.playerWarning(speakerData) + ` ${ChatLink.i18n('tokenchatlink.noTokenFound')}` : ChatLink.playerWarning(speakerData);
         ChatLink.warning(message);
@@ -163,23 +173,23 @@ export class ChatLink {
     static formatLink(html) {
         html.hover(() => {
             html.addClass('tokenChatLink')
-            let tooltip = $(document).find('.tokenChatLink-tooltip');
-            tooltip.remove();
-
-            ChatLink.hoverTimer = setTimeout(() => {
-                // add tooltip
-                tooltip = document.createElement("SPAN");
-                tooltip.classList.add('tokenChatLink-tooltip');
-                let tooltipContent = TooltipHelper.getContent();
-                tooltip.innerHTML = tooltipContent;
-                html.append(tooltip)
-
-                // adjust position of tooltip
-                tooltip = $(document).find('.tokenChatLink-tooltip');
-                let htmlRect = html[0].getBoundingClientRect();
-                let tooltipRect = tooltip[0].getBoundingClientRect();
-                tooltip.css('top', htmlRect.y - tooltipRect.height - 10).css('left', 15);
-            }, ChatLink.hoverTimeout);
+            
+            if (ChatLink.showTooltip) {
+                ChatLink.hoverTimer = setTimeout(() => {
+                    // add tooltip
+                    let tooltip = document.createElement("SPAN");
+                    tooltip.classList.add('tokenChatLink-tooltip');
+                    let content = TooltipHelper.getContent();
+                    tooltip.innerHTML = content;
+                    html.append(tooltip)
+    
+                    // adjust position of tooltip
+                    tooltip = $(document).find('.tokenChatLink-tooltip');
+                    let htmlRect = html[0].getBoundingClientRect();
+                    let tooltipRect = tooltip[0].getBoundingClientRect();
+                    tooltip.css('top', htmlRect.y - tooltipRect.height - 10).css('left', 15);
+                }, ChatLink.hoverTimeout);
+            }
         }, 
         () => {
             clearTimeout(ChatLink.hoverTimer);
