@@ -83,7 +83,7 @@ export class ChatLink {
     }
 
     static getToken(speakerData) {
-        let token = game.actors.tokens[speakerData.idToken]?.token;
+        let token = canvas.tokens.placeables.find(t => t.id === speakerData.idToken);
         if(!token)
             token = canvas.tokens.placeables.find(t => t.actor?._id === speakerData.idActor);
 
@@ -91,7 +91,7 @@ export class ChatLink {
     }
 
     static tokenExists(user, speakerData, token) {
-        if (token && token.interactive)
+        if (token && token.visible)
             return true;
         
         if (!ChatLink.isRightScene(user, speakerData))
@@ -152,18 +152,40 @@ export class ChatLink {
 
     static controlToken(event, user, token, ctrlKey) {
         let releaseOthers = {releaseOthers: !ctrlKey};
-        if (token._controlled && ctrlKey)
-            token.release();
-        else
+        if (ctrlKey) {
+            if (token._controlled)
+                token.release();
+            else
+                token.control(releaseOthers);
+
+            return;
+        }
+
+        if (token._controlled || canvas.tokens.controlled.length !== 1)
             token.control(releaseOthers);
+        else if (!token._controlled && canvas.tokens.controlled.length === 1)
+            token.control(releaseOthers);
+        else
+            token.release();
     }
 
     static targetToken(event, user, token, ctrlKey) {
         let releaseOthers = {releaseOthers: !ctrlKey};
-        if (token.isTargeted && ctrlKey)
-            token.setTarget(false, releaseOthers)
-        else
+        if (ctrlKey) {
+            if (token.isTargeted)
+                token.setTarget(false, releaseOthers);
+            else
+                token.setTarget(true, releaseOthers);
+
+            return;
+        }
+
+        if (token.isTargeted || game.user.targets.size !== 1)
             token.setTarget(true, releaseOthers);
+        else if (!token.isTargeted && game.user.targets.size === 1)
+            token.setTarget(true, releaseOthers);
+        else
+            token.setTarget(false, releaseOthers);
     }
 
     static getCoords(token) {
