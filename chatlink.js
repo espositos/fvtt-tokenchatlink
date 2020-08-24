@@ -180,12 +180,12 @@ export class ChatLink {
             return;
         }
 
-        if (token.isTargeted || game.user.targets.size !== 1)
+        if (token.isTargeted && game.user.targets.size !== 1)
             token.setTarget(true, releaseOthers);
-        else if (!token.isTargeted && game.user.targets.size === 1)
-            token.setTarget(true, releaseOthers);
-        else
+        else if (token.isTargeted && game.user.targets.size === 1)
             token.setTarget(false, releaseOthers);
+        else
+            token.setTarget(true, releaseOthers);
     }
 
     static getCoords(token) {
